@@ -74,10 +74,9 @@ public class Routes extends RouteBuilder {
 
             // curl -X POST localhost:18080/hello/send-jms?count=1000
 
-            fromF("sjms:queue:my-queue?concurrentConsumers=%s&transacted=true", concurrentConsumers)
+            fromF("sjms:queue:my-queue?concurrentConsumers=%s&acknowledgementMode=CLIENT_ACKNOWLEDGE&asyncConsumer=true", concurrentConsumers)
                     .bean("my-bean", "fromJMS")
-		    .threads(20)
-                    .to("kafka:my-topic?lingerMs=5");
+                    .to("kafka:my-topic");
 
             from("kafka:my-topic")
                     .bean("my-bean", "fromKafka");
