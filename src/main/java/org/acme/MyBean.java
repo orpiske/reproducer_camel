@@ -8,7 +8,7 @@ import org.apache.camel.component.kafka.consumer.KafkaManualCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 @ApplicationScoped
 @Identifier("my-bean")
@@ -16,17 +16,17 @@ public class MyBean {
 
     private static final Logger log = LoggerFactory.getLogger(MyBean.class);
 
-    static AtomicInteger countJMS = new AtomicInteger();
-    static AtomicInteger countKafka = new AtomicInteger();
+    static LongAdder countJMS = new LongAdder();
+    static LongAdder countKafka = new LongAdder();
 
     public void fromJMS(String body) {
         // log.info("received jms " + body);
-        countJMS.incrementAndGet();
+        countJMS.increment();
     }
 
     public void fromKafka(String body) {
         // log.info("received kafka " + body);
-        countKafka.incrementAndGet();
+        countKafka.increment();
     }
 
     public void commitKafka(Exchange exchange) {
@@ -36,18 +36,20 @@ public class MyBean {
 
     @Scheduled(every = "1s")
     public void logLastJms() {
-        int value = countJMS.getAndSet(0);
+        int value = countJMS.intValue();
         if (value != 0) {
             int rate = (int) (value * 1.0);
             String s = "Received from Jms: " + value + " in last 1 sec (" + rate + " messages/s)";
             log.info(s);
+            countJMS.reset();
         }
     }
 
     @Scheduled(every = "1s")
     public void logLastKafka() {
-        int value = countKafka.getAndSet(0);
+        int value = countKafka.intValue();
         if (value != 0) {
+            countKafka.reset();
             int rate = (int) (value * 1.0);
             String s = "Received from Kafka: " + value + " in last 1 sec (" + rate + " messages/s)";
             log.info(s);
