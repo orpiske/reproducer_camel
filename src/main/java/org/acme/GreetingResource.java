@@ -57,7 +57,7 @@ public class GreetingResource {
     void sendMessages(String text, int count, ConnectionFactory connectionFactory, Queue q) throws SystemException {
 
         String tx = ""+transactionManager.getTransaction();
-        log.info("Sending " + count + " message(s) with text " + text+" in tx " + tx);
+        log.info("Sending {} message(s) with text {} in tx {}", count, text, tx);
         long start = System.currentTimeMillis();
 
         try (JMSContext context = connectionFactory.createContext()) {
@@ -73,8 +73,8 @@ public class GreetingResource {
                 producer.send(q, message);
             }
         }
-        log.info("done sending " + count + " JMS message(s) with text " + text + " in " + (System.currentTimeMillis() - start)
-                + " ms");
+        // Note, subject to time drift and time inaccuracies for not using a monotonic time source.
+        log.info("done sending {} JMS message(s) with text {} in {} ms", count, text, System.currentTimeMillis() - start);
     }
 
     @POST
