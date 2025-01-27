@@ -107,6 +107,10 @@ public class Routes extends RouteBuilder {
             from("kafka:my-topic")
                     .bean("my-bean", "fromKafka");
 
+        } else if (scenario.equals("noop")) {
+
+            // do nothing
+
         }
     }
 }
