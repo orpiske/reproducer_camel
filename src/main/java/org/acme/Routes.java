@@ -13,6 +13,10 @@ public class Routes extends RouteBuilder {
     @ConfigProperty(name = "scenario.name", defaultValue = "jms")
     String scenario;
 
+    @ConfigProperty(name = "concurrent.consumers", defaultValue = "10")
+    String concurrentConsumers;
+
+
     @Override
     public void configure() throws Exception {
         LOG.infof("Preparing test for scenario %s", scenario);
@@ -60,7 +64,7 @@ public class Routes extends RouteBuilder {
 
             // curl -X POST localhost:18080/hello/send-jms?count=1000
 
-            from("jms:queue:my-queue?concurrentConsumers=10&transacted=true")
+            fromF("jms:queue:my-queue?concurrentConsumers=%s&transacted=true", concurrentConsumers)
                     .bean("my-bean", "fromJMS")
                     .to("kafka:my-topic");
 
@@ -70,12 +74,13 @@ public class Routes extends RouteBuilder {
 
             // curl -X POST localhost:18080/hello/send-jms?count=1000
 
-            from("sjms:queue:my-queue?concurrentConsumers=10&transacted=true")
-                    .bean("my-bean", "fromJMS");
-//                    .to("kafka:my-topic");
+            fromF("sjms:queue:my-queue?concurrentConsumers=%s&transacted=true", concurrentConsumers)
+                    .bean("my-bean", "fromJMS")
+		    .threads(20)
+                    .to("kafka:my-topic?lingerMs=5");
 
-//            from("kafka:my-topic")
-//                    .bean("my-bean", "fromKafka");
+            from("kafka:my-topic")
+                    .bean("my-bean", "fromKafka");
 
         } else if (scenario.equals("kafka-to-jms")) {
 
