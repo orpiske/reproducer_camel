@@ -36,14 +36,14 @@ public class Routes extends RouteBuilder {
 
             // curl -X POST localhost:18080/hello/send-jms?count=1000
 
-            from("jms:queue:my-queue?concurrentConsumers=10")
+            from("jms:queue:my-queue?concurrentConsumers=10&asyncConsumer=true")
                     .bean("my-bean", "fromJMS")
                     .to("kafka:my-topic");
 
             from("kafka:my-topic")
                     .bean("my-bean", "fromKafka");
 
-        } else if(scenario.equals("jms-to-kafka-tx")) {
+        }  else if(scenario.equals("jms-to-kafka-tx")) {
 
             // curl -X POST localhost:18080/hello/send-jms?count=1000
 
