@@ -1,12 +1,23 @@
 package org.acme;
 
-import org.apache.camel.builder.RouteBuilder;
+import jakarta.enterprise.context.ApplicationScoped;
 
+import org.apache.camel.builder.RouteBuilder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+
+@ApplicationScoped
 public class Routes extends RouteBuilder {
+    private static final Logger LOG = Logger.getLogger(Routes.class);
+
+    @ConfigProperty(name = "scenario.name", defaultValue = "jms")
+    String scenario;
+
     @Override
     public void configure() throws Exception {
+        LOG.infof("Preparing test for scenario %s", scenario);
 
-        String scenario = "jms"; // around 20'000 messages/sec
+        ; // around 20'000 messages/sec
 //        String scenario = "jms-to-kafka"; // around 4000 messages/sec
 //        String scenario = "jms-to-kafka-tx"; // around 150 messages/sec
 
