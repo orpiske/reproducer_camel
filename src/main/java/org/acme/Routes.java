@@ -66,7 +66,16 @@ public class Routes extends RouteBuilder {
 
             from("kafka:my-topic")
                     .bean("my-bean", "fromKafka");
+        } else if(scenario.equals("sjms-to-kafka-tx")) {
 
+            // curl -X POST localhost:18080/hello/send-jms?count=1000
+
+            from("sjms:queue:my-queue?concurrentConsumers=10&transacted=true")
+                    .bean("my-bean", "fromJMS");
+//                    .to("kafka:my-topic");
+
+//            from("kafka:my-topic")
+//                    .bean("my-bean", "fromKafka");
 
         } else if (scenario.equals("kafka-to-jms")) {
 
